@@ -122,13 +122,13 @@ class Form(QDialog):
                 if (row + direction, col - 1) in self.boardPieces and \
                     self.boardPieces[(row + direction, col - 1)] == self.GetOppositeColour() and \
                     (row + 2 * direction, col - 2) not in self.boardPieces:
-                    #If we can capture a piece allow that moce
+                    #If we can capture a piece allow that move
                     allowed_moves[(row + 2 * direction, col - 2)] = (row + direction, col - 1)
             if col < 6:
                 if (row + direction, col + 1) in self.boardPieces and \
                     self.boardPieces[(row + direction, col + 1)] == self.GetOppositeColour() and \
                     (row + 2 * direction, col + 2) not in self.boardPieces:
-                    #If we can capture a piece allow that moce
+                    #If we can capture a piece allow that move
                     allowed_moves[(row + 2 * direction, col + 2)] = (row + direction, col + 1)
             if len(allowed_moves) == 0:
                 #If there are no allowed moves this piece cannot be selected
