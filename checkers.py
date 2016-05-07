@@ -49,7 +49,11 @@ class Form(QDialog):
                         self.boardPieces[(i,j)] = "W"
                     if i >= 5:
                         self.boardPieces[(i,j)] = "B"
-                
+        self.LayoutBoard()        
+        
+    def LayoutBoard(self):
+        for i in range(8):
+            for j in range(8):
                 if (i,j) not in self.boardPieces:
                     wi = QTableWidgetItem("")
                     f = wi.font()
