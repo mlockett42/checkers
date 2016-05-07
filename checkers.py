@@ -39,6 +39,10 @@ class Form(QDialog):
         self.gridlayout.addWidget(self.labelCurrentPlayer, 1, 0)
         self.labelStatus = QLabel("Status")
         self.gridlayout.addWidget(self.labelStatus, 2, 0)
+        self.buttonEndTurn = QPushButton("End Turn")
+        self.buttonEndTurn.setVisible(False)
+        self.buttonEndTurn.clicked.connect(self.EndTurn)
+        self.gridlayout.addWidget(self.buttonEndTurn, 3, 0)
         self.boardScreen.verticalHeader().setVisible(False)
         self.boardScreen.horizontalHeader().setVisible(False)
         for i in range(8):
@@ -87,7 +91,7 @@ class Form(QDialog):
 
     def DisplayCurrentPlayer(self):
         global next_player
-        self.labelCurrentPlayer.setText("Current Player:" + ("White" if next_player == "W" else "Black"))
+        self.labelCurrentPlayer.setText("Current Player: " + ("White" if next_player == "W" else "Black"))
 
     def UpdateStatus(self, message):
         self.labelStatus.setText(message)
@@ -133,8 +137,18 @@ class Form(QDialog):
                 selected_piece = None
             else:
                 selected_piece = location
+                self.buttonEndTurn.setVisible(True)
             self.DisplayCurrentPlayer()
             self.LayoutBoard()
+
+    def EndTurn(self):
+        #In certain circumstances we can manually end our turn
+        global next_player
+        global selected_piece
+        next_player = self.GetOppositeColour()
+        selected_piece = None
+        self.DisplayCurrentPlayer()
+        self.buttonEndTurn.setVisible(False)
 
     def GetOppositeColour(self):
         #Return the opposite colour of the next player
