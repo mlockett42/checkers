@@ -27,6 +27,10 @@ class Form(QDialog):
         self.gridlayout = QGridLayout()
         self.boardScreen = QTableWidget(8,8)
         self.gridlayout.addWidget(self.boardScreen, 0, 0)
+        self.labelCurrentPlayer = QLabel("Current Player")
+        self.gridlayout.addWidget(self.labelCurrentPlayer, 1, 0)
+        self.labelStatus = QLabel("Status")
+        self.gridlayout.addWidget(self.labelStatus, 2, 0)
         self.boardScreen.verticalHeader().setVisible(False)
         self.boardScreen.horizontalHeader().setVisible(False)
         for i in range(8):
@@ -46,10 +50,13 @@ class Form(QDialog):
                 if (i + j) % 2 != 0:
                     #Piece can only go on a black square
                     if i <= 2:
+                        #White pieces at the top
                         self.boardPieces[(i,j)] = "W"
                     if i >= 5:
+                        #Black pieces at the bottom
                         self.boardPieces[(i,j)] = "B"
-        self.LayoutBoard()        
+        self.LayoutBoard()  
+        self.DisplayCurrentPlayer()      
         
     def LayoutBoard(self):
         for i in range(8):
@@ -73,7 +80,15 @@ class Form(QDialog):
 
         self.setLayout(self.gridlayout)
 
+    def DisplayCurrentPlayer(self):
+        global next_player
+        self.labelCurrentPlayer.setText("Current Player:" + ("White" if next_player == "W" else "Black"))
+
+next_player = None
+
 if __name__ == '__main__':
+    next_player = "B"
+
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
