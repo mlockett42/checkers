@@ -20,6 +20,12 @@ class ImgWhiteOnBlack(ClickableImageLabel):
 class ImgBlackOnBlack(ClickableImageLabel):
     image_location = "images/blackonblack.png"
 
+class ImgBlackSquare(ClickableImageLabel):
+    image_location = "images/blacksquare.png"
+
+class ImgWhiteSquare(ClickableImageLabel):
+    image_location = "images/whitesquare.png"
+
 class Form(QDialog):
    
     def __init__(self, parent=None):
@@ -64,15 +70,10 @@ class Form(QDialog):
         for i in range(8):
             for j in range(8):
                 if (i,j) not in self.boardPieces:
-                    wi = QTableWidgetItem("")
-                    f = wi.font()
-                    f.setPointSize(14)
-                    wi.setFont(f)
                     if (i + j) % 2 == 0:
-                        wi.setBackground(QBrush(QColor.fromRgb(255,255,255)))
+                        self.boardScreen.setCellWidget(i,j, ImgWhiteSquare(self, (i,j)))
                     else:
-                        wi.setBackground(QBrush(QColor.fromRgb(0,0,0)))
-                    self.boardScreen.setItem(i,j,wi)
+                        self.boardScreen.setCellWidget(i,j, ImgBlackSquare(self, (i,j)))
                 elif self.boardPieces[(i,j)] == "W":
                     self.boardScreen.setCellWidget(i,j, ImgWhiteOnBlack(self, (i,j)))
                 elif self.boardPieces[(i,j)] == "B":
@@ -87,7 +88,7 @@ class Form(QDialog):
         self.labelCurrentPlayer.setText("Current Player:" + ("White" if next_player == "W" else "Black"))
 
     def LabelClicked(self, location):
-        print ("click it location = ",location)
+        pass
 
 next_player = None
 
