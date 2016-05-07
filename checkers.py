@@ -80,7 +80,5 @@ if __name__ == '__main__':
     form = Form()
     form.show()
 
-    #QTimer.singleShot(0, form.CalcGridHeight)
-    
     # Run the main Qt loop
     sys.exit(app.exec_())
