@@ -4,27 +4,21 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtNetwork import *
 
-class ClickableLabel(QLabel):
+class ClickableImageLabel(QLabel):
     def __init__(self, parent, location):
-        super(ClickableLabel, self).__init__(parent)
+        super(ClickableImageLabel, self).__init__(parent)
         self.form = parent
         self.location = location
+        pic = QPixmap(self.image_location)
+        self.setPixmap(pic)
     def mouseReleaseEvent(self, ev):
         self.form.LabelClicked(self.location)
 
-class ImgWhiteOnBlack(ClickableLabel):
+class ImgWhiteOnBlack(ClickableImageLabel):
+    image_location = "images/whiteonblack.png"
 
-    def __init__(self, parent, location):
-        super(ImgWhiteOnBlack, self).__init__(parent, location)
-        pic = QPixmap("images/whiteonblack.png")
-        self.setPixmap(pic)
-
-class ImgBlackOnBlack(ClickableLabel):
-
-    def __init__(self, parent, location):
-        super(ImgBlackOnBlack, self).__init__(parent, location)
-        pic = QPixmap("images/blackonblack.png")
-        self.setPixmap(pic)
+class ImgBlackOnBlack(ClickableImageLabel):
+    image_location = "images/blackonblack.png"
 
 class Form(QDialog):
    
