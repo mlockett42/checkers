@@ -95,28 +95,41 @@ class Form(QDialog):
     def LabelClicked(self, location):
         global selected_piece
         global allowed_moves
+        global next_player
         if selected_piece is None:
             #If nothing is selected choose a piece to move
             if location not in self.boardPieces:
                 #No piece on that square
                 return
-            global next_player
             if next_player != self.boardPieces[location][0]:
                 #Not the current player piece
                 return
             (row, col) = location
             #White pieces move down black pieces move up
             direction = 1 if self.boardPieces[location][0] == "W" else -1
-            #Create the allowed moves set
-            allowed_moves = set()
+            #Create the allowed moves dict a dict mapping locations we can move to to pieces
+            #we can capture
+            allowed_moves = dict()
             if col > 0:
                 if (row + direction, col - 1) not in self.boardPieces:
                     #If there is no piece in that position we may move there
-                    allowed_moves.add((row + direction, col - 1))
+                    allowed_moves[(row + direction, col - 1)] = None
             if col < 7:
                 if (row + direction, col + 1) not in self.boardPieces:
                     #If there is no piece in that position we may move there
-                    allowed_moves.add((row + direction, col + 1))
+                    allowed_moves[(row + direction, col + 1)] = None
+            if col > 1:
+                if (row + direction, col - 1) in self.boardPieces and \
+                    self.boardPieces[(row + direction, col - 1)] == self.GetOppositeColour() and \
+                    (row + 2 * direction, col - 2) not in self.boardPieces:
+                    #If we can capture a piece allow that moce
+                    allowed_moves[(row + 2 * direction, col - 2)] = (row + direction, col - 1)
+            if col < 6:
+                if (row + direction, col + 1) in self.boardPieces and \
+                    self.boardPieces[(row + direction, col + 1)] == self.GetOppositeColour() and \
+                    (row + 2 * direction, col + 2) not in self.boardPieces:
+                    #If we can capture a piece allow that moce
+                    allowed_moves[(row + 2 * direction, col + 2)] = (row + direction, col + 1)
             if len(allowed_moves) == 0:
                 #If there are no allowed moves this piece cannot be selected
                 allowed_moves = None
@@ -126,16 +139,26 @@ class Form(QDialog):
         else:
             if location not in allowed_moves:
                 return
+            captured_piece = allowed_moves[location]
             self.boardPieces[location] = self.boardPieces[selected_piece]
             del self.boardPieces[selected_piece]
-            self.UpdateStatus("Piece moved from " + str(selected_piece) + " to " + str(location))
+            status = "Piece moved from " + str(selected_piece) + " to " + str(location)
+            if captured_piece:
+                del self.boardPieces[captured_piece]
+                status += " piece captured at " + str(captured_piece)
+            self.UpdateStatus(status)
             selected_piece = None
             allowed_moves = None
-            next_player = "W" if next_player == "B" else "B"
+            next_player = self.GetOppositeColour()
             self.DisplayCurrentPlayer()
             self.LayoutBoard()
 
-            
+    def GetOppositeColour(self):
+        #Return the opposite colour of the next player
+        global next_player
+        return "W" if next_player == "B" else "B"
+
+
 #The next player either "W" or "B"
 next_player = None
 #The selected piece ie the one we are moving
