@@ -4,17 +4,25 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtNetwork import *
 
-class ImgWhiteOnBlack(QLabel):
+class ClickableLabel(QLabel):
+    def __init__(self, parent, location):
+        super(ClickableLabel, self).__init__(parent)
+        self.form = parent
+        self.location = location
+    def mouseReleaseEvent(self, ev):
+        self.form.LabelClicked(self.location)
 
-    def __init__(self, parent=None):
-        super(ImgWhiteOnBlack, self).__init__(parent)
+class ImgWhiteOnBlack(ClickableLabel):
+
+    def __init__(self, parent, location):
+        super(ImgWhiteOnBlack, self).__init__(parent, location)
         pic = QPixmap("images/whiteonblack.png")
         self.setPixmap(pic)
 
-class ImgBlackOnBlack(QLabel):
+class ImgBlackOnBlack(ClickableLabel):
 
-    def __init__(self, parent=None):
-        super(ImgBlackOnBlack, self).__init__(parent)
+    def __init__(self, parent, location):
+        super(ImgBlackOnBlack, self).__init__(parent, location)
         pic = QPixmap("images/blackonblack.png")
         self.setPixmap(pic)
 
@@ -72,9 +80,9 @@ class Form(QDialog):
                         wi.setBackground(QBrush(QColor.fromRgb(0,0,0)))
                     self.boardScreen.setItem(i,j,wi)
                 elif self.boardPieces[(i,j)] == "W":
-                    self.boardScreen.setCellWidget(i,j, ImgWhiteOnBlack(self))
+                    self.boardScreen.setCellWidget(i,j, ImgWhiteOnBlack(self, (i,j)))
                 elif self.boardPieces[(i,j)] == "B":
-                    self.boardScreen.setCellWidget(i,j, ImgBlackOnBlack(self))
+                    self.boardScreen.setCellWidget(i,j, ImgBlackOnBlack(self, (i,j)))
                 else:
                     assert False
 
@@ -84,10 +92,13 @@ class Form(QDialog):
         global next_player
         self.labelCurrentPlayer.setText("Current Player:" + ("White" if next_player == "W" else "Black"))
 
+    def LabelClicked(self, location):
+        print ("click it location = ",location)
+
 next_player = None
 
 if __name__ == '__main__':
-    next_player = "B"
+    next_player = "W"
 
     # Create the Qt Application
     app = QApplication(sys.argv)
