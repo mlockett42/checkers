@@ -46,7 +46,9 @@ class Form(QDialog):
         for i in range(8):
             self.boardScreen.setRowHeight(i, 100)
 
+        self.InitialBoardSetup()
 
+    def InitialBoardSetup(self):
         #A dict of board positions (stored as tuples) mapping to the underlying game pieces. The game piece 
         #is stored as a string. First character W or B for white or black. Optional second character if it
         #is a king
