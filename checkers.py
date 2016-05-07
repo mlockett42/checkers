@@ -93,18 +93,43 @@ class Form(QDialog):
     def LabelClicked(self, location):
         global selected_piece
         if selected_piece is None:
+            #If nothing is selected choose a piece to move
             if location not in self.boardPieces:
                 #No piece on that square
                 return
             global next_player
-            if next_player not in self.boardPieces[location]:
+            if next_player != self.boardPieces[location][0]:
                 #Not the current player piece
                 return
-            self.UpdateStatus("Selected piece at " + str(location))
+            (row, col) = location
+            #White pieces move down black pieces move up
+            direction = 1 if self.boardPieces[location][0] == "W" else -1
+            global allowed_moves
+            #Create the allowed moves set
+            allowed_moves = set()
+            if col > 0:
+                if (row + direction, col - 1) not in self.boardPieces:
+                    #If there is no piece in that position we may move there
+                    allowed_moves.add((row + direction, col - 1))
+            if col < 7:
+                if (row + direction, col + 1) not in self.boardPieces:
+                    #If there is no piece in that position we may move there
+                    allowed_moves.add((row + direction, col + 1))
+            if len(allowed_moves) == 0:
+                #If there are no allowed moves this piece cannot be selected
+                allowed_moves = None
+                return
             selected_piece = location
-
+            self.UpdateStatus("Selected piece at " + str(location))
+        else:
+            pass
+            
+#The next player either "W" or "B"
 next_player = None
+#The selected piece ie the one we are moving
 selected_piece = None
+#A set of 
+allowed_moves = None 
 
 if __name__ == '__main__':
     next_player = "W"
