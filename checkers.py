@@ -87,10 +87,24 @@ class Form(QDialog):
         global next_player
         self.labelCurrentPlayer.setText("Current Player:" + ("White" if next_player == "W" else "Black"))
 
+    def UpdateStatus(self, message):
+        self.labelStatus.setText(message)
+
     def LabelClicked(self, location):
-        pass
+        global selected_piece
+        if selected_piece is None:
+            if location not in self.boardPieces:
+                #No piece on that square
+                return
+            global next_player
+            if next_player not in self.boardPieces[location]:
+                #Not the current player piece
+                return
+            self.UpdateStatus("Selected piece at " + str(location))
+            selected_piece = location
 
 next_player = None
+selected_piece = None
 
 if __name__ == '__main__':
     next_player = "W"
