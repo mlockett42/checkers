@@ -4,6 +4,20 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtNetwork import *
 
+class ImgWhiteOnBlack(QLabel):
+
+    def __init__(self, parent=None):
+        super(ImgWhiteOnBlack, self).__init__(parent)
+        pic = QPixmap("images/whiteonblack.png")
+        self.setPixmap(pic)
+
+class ImgBlackOnBlack(QLabel):
+
+    def __init__(self, parent=None):
+        super(ImgBlackOnBlack, self).__init__(parent)
+        pic = QPixmap("images/blackonblack.png")
+        self.setPixmap(pic)
+
 class Form(QDialog):
    
     def __init__(self, parent=None):
@@ -16,9 +30,9 @@ class Form(QDialog):
         self.boardScreen.verticalHeader().setVisible(False)
         self.boardScreen.horizontalHeader().setVisible(False)
         for i in range(8):
-            self.boardScreen.setColumnWidth(i, 80)
+            self.boardScreen.setColumnWidth(i, 100)
         for i in range(8):
-            self.boardScreen.setRowHeight(i, 80)
+            self.boardScreen.setRowHeight(i, 100)
 
 
         self.boardButtons = dict() #A dict of board positions (stored as tuples) mapping to the underlying UI objects
@@ -33,7 +47,8 @@ class Form(QDialog):
                     wi.setBackground(QBrush(QColor.fromRgb(255,255,255)))
                 else:
                     wi.setBackground(QBrush(QColor.fromRgb(0,0,0)))
-                self.boardScreen.setItem(i,j,wi)
+                #self.boardScreen.setItem(i,j,wi)
+                self.boardScreen.setCellWidget(i,j, ImgBlackOnBlack(self))
                 self.boardButtons[(i,j)] = wi
 
         self.setLayout(self.gridlayout)
