@@ -35,21 +35,37 @@ class Form(QDialog):
             self.boardScreen.setRowHeight(i, 100)
 
 
-        self.boardButtons = dict() #A dict of board positions (stored as tuples) mapping to the underlying UI objects
+        #A dict of board positions (stored as tuples) mapping to the underlying game pieces. The game piece 
+        #is stored as a string. First character W or B for white or black. Optional second character if it
+        #is a king
+        self.boardPieces = dict() 
 
         for i in range(8):
             for j in range(8):
-                wi = QTableWidgetItem("")
-                f = wi.font()
-                f.setPointSize(14)
-                wi.setFont(f)
-                if (i + j) % 2 == 0:
-                    wi.setBackground(QBrush(QColor.fromRgb(255,255,255)))
+                #Position the initial pieces
+                if (i + j) % 2 != 0:
+                    #Piece can only go on a black square
+                    if i <= 2:
+                        self.boardPieces[(i,j)] = "W"
+                    if i >= 5:
+                        self.boardPieces[(i,j)] = "B"
+                
+                if (i,j) not in self.boardPieces:
+                    wi = QTableWidgetItem("")
+                    f = wi.font()
+                    f.setPointSize(14)
+                    wi.setFont(f)
+                    if (i + j) % 2 == 0:
+                        wi.setBackground(QBrush(QColor.fromRgb(255,255,255)))
+                    else:
+                        wi.setBackground(QBrush(QColor.fromRgb(0,0,0)))
+                    self.boardScreen.setItem(i,j,wi)
+                elif self.boardPieces[(i,j)] == "W":
+                    self.boardScreen.setCellWidget(i,j, ImgWhiteOnBlack(self))
+                elif self.boardPieces[(i,j)] == "B":
+                    self.boardScreen.setCellWidget(i,j, ImgBlackOnBlack(self))
                 else:
-                    wi.setBackground(QBrush(QColor.fromRgb(0,0,0)))
-                #self.boardScreen.setItem(i,j,wi)
-                self.boardScreen.setCellWidget(i,j, ImgBlackOnBlack(self))
-                self.boardButtons[(i,j)] = wi
+                    assert False
 
         self.setLayout(self.gridlayout)
 
