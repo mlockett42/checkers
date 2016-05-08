@@ -192,6 +192,16 @@ class Form(QDialog):
             if (row + direction, col + 1) not in self.boardPieces:
                 #If there is no piece in that position we may move there
                 allowed_moves[(row + direction, col + 1)] = None
+        if self.boardPieces[location][-1] == "K":
+            #If the piece is a king it can move backwards
+            if col > 0:
+                if (row - direction, col - 1) not in self.boardPieces:
+                    #If there is no piece in that position we may move there
+                    allowed_moves[(row - direction, col - 1)] = None
+            if col < 7:
+                if (row - direction, col + 1) not in self.boardPieces:
+                    #If there is no piece in that position we may move there
+                    allowed_moves[(row - direction, col + 1)] = None
         self.CalcAllowedCaptureMoves(location)
 
     def CalcAllowedCaptureMoves(self, location):
@@ -213,6 +223,20 @@ class Form(QDialog):
                 (row + 2 * direction, col + 2) not in self.boardPieces:
                 #If we can capture a piece allow that move
                 allowed_moves[(row + 2 * direction, col + 2)] = (row + direction, col + 1)
+        if self.boardPieces[location][-1] == "K":
+            #If the piece is a king it can move backwards
+            if col > 1:
+                if (row - direction, col - 1) in self.boardPieces and \
+                    self.boardPieces[(row - direction, col - 1)] == self.GetOppositeColour() and \
+                    (row - 2 * direction, col - 2) not in self.boardPieces:
+                    #If we can capture a piece allow that move
+                    allowed_moves[(row - 2 * direction, col - 2)] = (row - direction, col - 1)
+            if col < 6:
+                if (row - direction, col + 1) in self.boardPieces and \
+                    self.boardPieces[(row - direction, col + 1)] == self.GetOppositeColour() and \
+                    (row - 2 * direction, col + 2) not in self.boardPieces:
+                    #If we can capture a piece allow that move
+                    allowed_moves[(row - 2 * direction, col + 2)] = (row - direction, col + 1)
 
 
 #The next player either "W" or "B"
