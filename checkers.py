@@ -1,4 +1,5 @@
 #A checkers game to introduce Python programming concepts
+#Licence Apache 2.0
 import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -157,6 +158,7 @@ class Form(QDialog):
                 self.buttonEndTurn.setVisible(True)
             self.DisplayCurrentPlayer()
             self.LayoutBoard()
+            self.CheckForWinner()
 
     def GetDirection(self):
         global next_player
@@ -238,6 +240,21 @@ class Form(QDialog):
                     #If we can capture a piece allow that move
                     allowed_moves[(row - 2 * direction, col + 2)] = (row - direction, col + 1)
 
+    def CheckForWinner(self):
+        #Build a list of our pieces. If it is empty the other player has won
+        global next_player
+        remaining_pieces = list()
+        #Loop over the board and add the co ordinates of every piece of our
+        for i in range(8):
+            for j in range(8):
+                if (i,j) in self.boardPieces:
+                    if self.boardPieces[(i,j)][0] == next_player:
+                        remaining_pieces.append((i,j))
+        if len(remaining_pieces) == 0:
+            #If we have no pieces the other player has won
+            self.UpdateStatus(("White" if next_player == "B" else "Black") + " has won")
+            
+        
 
 #The next player either "W" or "B"
 next_player = None
