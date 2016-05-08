@@ -211,13 +211,13 @@ class Form(QDialog):
         direction = self.GetDirection()
         if col > 1:
             if (row + direction, col - 1) in self.boardPieces and \
-                self.boardPieces[(row + direction, col - 1)] == self.GetOppositeColour() and \
+                self.boardPieces[(row + direction, col - 1)][0] == self.GetOppositeColour() and \
                 (row + 2 * direction, col - 2) not in self.boardPieces:
                 #If we can capture a piece allow that move
                 self.allowed_moves[(row + 2 * direction, col - 2)] = (row + direction, col - 1)
         if col < 6:
             if (row + direction, col + 1) in self.boardPieces and \
-                self.boardPieces[(row + direction, col + 1)] == self.GetOppositeColour() and \
+                self.boardPieces[(row + direction, col + 1)][0] == self.GetOppositeColour() and \
                 (row + 2 * direction, col + 2) not in self.boardPieces:
                 #If we can capture a piece allow that move
                 self.allowed_moves[(row + 2 * direction, col + 2)] = (row + direction, col + 1)
@@ -225,13 +225,13 @@ class Form(QDialog):
             #If the piece is a king it can move backwards
             if col > 1:
                 if (row - direction, col - 1) in self.boardPieces and \
-                    self.boardPieces[(row - direction, col - 1)] == self.GetOppositeColour() and \
+                    self.boardPieces[(row - direction, col - 1)][0] == self.GetOppositeColour() and \
                     (row - 2 * direction, col - 2) not in self.boardPieces:
                     #If we can capture a piece allow that move
                     self.allowed_moves[(row - 2 * direction, col - 2)] = (row - direction, col - 1)
             if col < 6:
                 if (row - direction, col + 1) in self.boardPieces and \
-                    self.boardPieces[(row - direction, col + 1)] == self.GetOppositeColour() and \
+                    self.boardPieces[(row - direction, col + 1)][0] == self.GetOppositeColour() and \
                     (row - 2 * direction, col + 2) not in self.boardPieces:
                     #If we can capture a piece allow that move
                     self.allowed_moves[(row - 2 * direction, col + 2)] = (row - direction, col + 1)
