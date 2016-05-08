@@ -20,6 +20,12 @@ class ImgWhiteOnBlack(ClickableImageLabel):
 class ImgBlackOnBlack(ClickableImageLabel):
     image_location = "images/blackonblack.png"
 
+class ImgWhiteKingOnBlack(ClickableImageLabel):
+    image_location = "images/whitekingonblack.png"
+
+class ImgBlackKingOnBlack(ClickableImageLabel):
+    image_location = "images/blackkingonblack.png"
+
 class ImgBlackSquare(ClickableImageLabel):
     image_location = "images/blacksquare.png"
 
@@ -84,6 +90,10 @@ class Form(QDialog):
                     self.boardScreen.setCellWidget(i,j, ImgWhiteOnBlack(self, (i,j)))
                 elif self.boardPieces[(i,j)] == "B":
                     self.boardScreen.setCellWidget(i,j, ImgBlackOnBlack(self, (i,j)))
+                elif self.boardPieces[(i,j)] == "WK":
+                    self.boardScreen.setCellWidget(i,j, ImgWhiteKingOnBlack(self, (i,j)))
+                elif self.boardPieces[(i,j)] == "BK":
+                    self.boardScreen.setCellWidget(i,j, ImgBlackKingOnBlack(self, (i,j)))
                 else:
                     assert False
 
@@ -132,14 +142,25 @@ class Form(QDialog):
                 allowed_moves = None
             self.UpdateStatus(status)
             if allowed_moves is None or len(allowed_moves) == 0:
+                #Check to see if we should make this piece into a king
+                (row, col) = location
+                final_row = 7 if next_player == "W" else 0
+                if len(self.boardPieces[location]) == 1 and row == final_row:
+                    #If the piece in question is not a king (ie only one character) and has been placed onto the final row make it a king
+                    self.boardPieces[location] += "K"
                 #Only move to the next player if more captures are impossible
                 next_player = self.GetOppositeColour()
                 selected_piece = None
+                self.buttonEndTurn.setVisible(False)
             else:
                 selected_piece = location
                 self.buttonEndTurn.setVisible(True)
             self.DisplayCurrentPlayer()
             self.LayoutBoard()
+
+    def GetDirection(self):
+        global next_player
+        return 1 if next_player == "W" else -1
 
     def EndTurn(self):
         #In certain circumstances we can manually end our turn
@@ -162,7 +183,7 @@ class Form(QDialog):
         #we can capture
         allowed_moves = dict()
         #White pieces move down black pieces move up
-        direction = 1 if self.boardPieces[location][0] == "W" else -1
+        direction = self.GetDirection()
         if col > 0:
             if (row + direction, col - 1) not in self.boardPieces:
                 #If there is no piece in that position we may move there
@@ -179,7 +200,7 @@ class Form(QDialog):
         #Create the allowed moves dict a dict mapping locations we can move to to pieces
         #we can capture
         #White pieces move down black pieces move up
-        direction = 1 if self.boardPieces[location][0] == "W" else -1
+        direction = self.GetDirection()
         if col > 1:
             if (row + direction, col - 1) in self.boardPieces and \
                 self.boardPieces[(row + direction, col - 1)] == self.GetOppositeColour() and \
