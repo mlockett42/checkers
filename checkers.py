@@ -56,6 +56,12 @@ class Form(QDialog):
             self.boardScreen.setColumnWidth(i, 100)
         for i in range(8):
             self.boardScreen.setRowHeight(i, 100)
+        #A set of allowed moves
+        self.allowed_moves = None 
+        #The selected piece ie the one we are moving
+        self.selected_piece = None
+        #The next player either "W" or "B". White starts
+        self.next_player = "W"
 
         self.InitialBoardSetup()
 
@@ -101,114 +107,104 @@ class Form(QDialog):
         self.setLayout(self.gridlayout)
 
     def DisplayCurrentPlayer(self):
-        global next_player
-        self.labelCurrentPlayer.setText("Current Player: " + ("White" if next_player == "W" else "Black"))
+        self.labelCurrentPlayer.setText("Current Player: " + ("White" if self.next_player == "W" else "Black"))
 
     def UpdateStatus(self, message):
         self.labelStatus.setText(message)
 
     def LabelClicked(self, location):
-        global selected_piece
-        global allowed_moves
-        global next_player
-        if selected_piece is None:
+        if self.selected_piece is None:
             #If nothing is selected choose a piece to move
             if location not in self.boardPieces:
                 #No piece on that square
                 return
-            if next_player != self.boardPieces[location][0]:
+            if self.next_player != self.boardPieces[location][0]:
                 #Not the current player piece
                 return
             self.CalcAllowedMoves(location)
-            if len(allowed_moves) == 0:
+            if len(self.allowed_moves) == 0:
                 #If there are no allowed moves this piece cannot be selected
-                allowed_moves = None
+                self.allowed_moves = None
                 return
-            selected_piece = location
+            self.selected_piece = location
             self.UpdateStatus("Selected piece at " + str(location))
         else:
-            if location not in allowed_moves:
+            if location not in self.allowed_moves:
                 return
-            captured_piece = allowed_moves[location]
-            self.boardPieces[location] = self.boardPieces[selected_piece]
-            del self.boardPieces[selected_piece]
-            status = "Piece moved from " + str(selected_piece) + " to " + str(location)
+            captured_piece = self.allowed_moves[location]
+            self.boardPieces[location] = self.boardPieces[self.selected_piece]
+            del self.boardPieces[self.selected_piece]
+            status = "Piece moved from " + str(self.selected_piece) + " to " + str(location)
             if captured_piece is not None:
                 del self.boardPieces[captured_piece]
                 status += " piece captured at " + str(captured_piece)
                 #Test to see if more captures are possible
-                allowed_moves = dict()
+                self.allowed_moves = dict()
                 self.CalcAllowedCaptureMoves(location)
             else:
-                allowed_moves = None
+                self.allowed_moves = None
             self.UpdateStatus(status)
-            if allowed_moves is None or len(allowed_moves) == 0:
+            if self.allowed_moves is None or len(self.allowed_moves) == 0:
                 #Check to see if we should make this piece into a king
                 (row, col) = location
-                final_row = 7 if next_player == "W" else 0
+                final_row = 7 if self.next_player == "W" else 0
                 if len(self.boardPieces[location]) == 1 and row == final_row:
                     #If the piece in question is not a king (ie only one character) and has been placed onto the final row make it a king
                     self.boardPieces[location] += "K"
                 #Only move to the next player if more captures are impossible
-                next_player = self.GetOppositeColour()
-                selected_piece = None
+                self.next_player = self.GetOppositeColour()
+                self.selected_piece = None
                 self.buttonEndTurn.setVisible(False)
             else:
-                selected_piece = location
+                self.selected_piece = location
                 self.buttonEndTurn.setVisible(True)
             self.DisplayCurrentPlayer()
             self.LayoutBoard()
             self.CheckForWinner()
 
     def GetDirection(self):
-        global next_player
-        return 1 if next_player == "W" else -1
+        return 1 if self.next_player == "W" else -1
 
     def EndTurn(self):
         #In certain circumstances we can manually end our turn
-        global next_player
-        global selected_piece
-        next_player = self.GetOppositeColour()
-        selected_piece = None
+        self.next_player = self.GetOppositeColour()
+        self.selected_piece = None
         self.DisplayCurrentPlayer()
         self.buttonEndTurn.setVisible(False)
 
     def GetOppositeColour(self):
         #Return the opposite colour of the next player
-        global next_player
-        return "W" if next_player == "B" else "B"
+        return "W" if self.next_player == "B" else "B"
     
     def CalcAllowedMoves(self, location):
         (row, col) = location
-        global allowed_moves
         #Create the allowed moves dict a dict mapping locations we can move to to pieces
         #we can capture
-        allowed_moves = dict()
+        self.allowed_moves = dict()
         #White pieces move down black pieces move up
         direction = self.GetDirection()
         if col > 0:
             if (row + direction, col - 1) not in self.boardPieces:
                 #If there is no piece in that position we may move there
-                allowed_moves[(row + direction, col - 1)] = None
+                self.allowed_moves[(row + direction, col - 1)] = None
         if col < 7:
             if (row + direction, col + 1) not in self.boardPieces:
                 #If there is no piece in that position we may move there
-                allowed_moves[(row + direction, col + 1)] = None
+                self.allowed_moves[(row + direction, col + 1)] = None
         if self.boardPieces[location][-1] == "K":
             #If the piece is a king it can move backwards
             if col > 0:
                 if (row - direction, col - 1) not in self.boardPieces:
                     #If there is no piece in that position we may move there
-                    allowed_moves[(row - direction, col - 1)] = None
+                    self.allowed_moves[(row - direction, col - 1)] = None
             if col < 7:
                 if (row - direction, col + 1) not in self.boardPieces:
                     #If there is no piece in that position we may move there
-                    allowed_moves[(row - direction, col + 1)] = None
+                    self.allowed_moves[(row - direction, col + 1)] = None
         self.CalcAllowedCaptureMoves(location)
 
     def CalcAllowedCaptureMoves(self, location):
         (row, col) = location
-        global allowed_moves
         #Create the allowed moves dict a dict mapping locations we can move to to pieces
         #we can capture
         #White pieces move down black pieces move up
@@ -218,13 +214,13 @@ class Form(QDialog):
                 self.boardPieces[(row + direction, col - 1)] == self.GetOppositeColour() and \
                 (row + 2 * direction, col - 2) not in self.boardPieces:
                 #If we can capture a piece allow that move
-                allowed_moves[(row + 2 * direction, col - 2)] = (row + direction, col - 1)
+                self.allowed_moves[(row + 2 * direction, col - 2)] = (row + direction, col - 1)
         if col < 6:
             if (row + direction, col + 1) in self.boardPieces and \
                 self.boardPieces[(row + direction, col + 1)] == self.GetOppositeColour() and \
                 (row + 2 * direction, col + 2) not in self.boardPieces:
                 #If we can capture a piece allow that move
-                allowed_moves[(row + 2 * direction, col + 2)] = (row + direction, col + 1)
+                self.allowed_moves[(row + 2 * direction, col + 2)] = (row + direction, col + 1)
         if self.boardPieces[location][-1] == "K":
             #If the piece is a king it can move backwards
             if col > 1:
@@ -232,40 +228,29 @@ class Form(QDialog):
                     self.boardPieces[(row - direction, col - 1)] == self.GetOppositeColour() and \
                     (row - 2 * direction, col - 2) not in self.boardPieces:
                     #If we can capture a piece allow that move
-                    allowed_moves[(row - 2 * direction, col - 2)] = (row - direction, col - 1)
+                    self.allowed_moves[(row - 2 * direction, col - 2)] = (row - direction, col - 1)
             if col < 6:
                 if (row - direction, col + 1) in self.boardPieces and \
                     self.boardPieces[(row - direction, col + 1)] == self.GetOppositeColour() and \
                     (row - 2 * direction, col + 2) not in self.boardPieces:
                     #If we can capture a piece allow that move
-                    allowed_moves[(row - 2 * direction, col + 2)] = (row - direction, col + 1)
+                    self.allowed_moves[(row - 2 * direction, col + 2)] = (row - direction, col + 1)
 
     def CheckForWinner(self):
         #Build a list of our pieces. If it is empty the other player has won
-        global next_player
         remaining_pieces = list()
         #Loop over the board and add the co ordinates of every piece of our
         for i in range(8):
             for j in range(8):
                 if (i,j) in self.boardPieces:
-                    if self.boardPieces[(i,j)][0] == next_player:
+                    if self.boardPieces[(i,j)][0] == self.next_player:
                         remaining_pieces.append((i,j))
         if len(remaining_pieces) == 0:
             #If we have no pieces the other player has won
-            self.UpdateStatus(("White" if next_player == "B" else "Black") + " has won")
+            self.UpdateStatus(("White" if self.next_player == "B" else "Black") + " has won")
             
         
-
-#The next player either "W" or "B"
-next_player = None
-#The selected piece ie the one we are moving
-selected_piece = None
-#A set of 
-allowed_moves = None 
-
 if __name__ == '__main__':
-    next_player = "W"
-
     # Create the Qt Application
     app = QApplication(sys.argv)
     # Create and show the form
