@@ -11,3 +11,4 @@ python3 checkers.py
 
 Installing pyside takes quite a long time because it has to download and install Qt
 
+#Hello from test
